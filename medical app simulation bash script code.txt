@@ -1,0 +1,348 @@
+
+
+
+username=("admin" "amar" "damir" "samir" "almir")                               
+password=("admin11" "amar11" "damir11" "samir11" "almir11")                     
+fname=("Amar" "Damir" "Samir" "Almir")
+lname=("Sabo" "Zulic" "Hamic" "Sakic")
+Adress=("Sici 161" "Sici 162" "Sici 163" "Sici 164")
+jmb=("001123" "001124" "001125" "001126")
+Analiza=("Prehlada grla" "Temperatura" "Insomnia" "Bol u ledjima")
+odjel=("Interna Medicina" "Radioterapija" "Hematologija" "Pedijatrija")
+cap_odjela=("-" "-" "-" "-")
+loginmeni (){
+
+   
+
+echo "Unesite username:"
+read loginuser                                                                  ##Citanje username-a
+
+if [[ " ${username[*]} " =~ " ${loginuser} " ]]                                 ##StackOverflow kaze "The right side is considered an extended regular expression. If the left side matches, the operator returns 0, and 1 otherwise."
+     then
+        
+        for i in "${!username[@]}"; do                                          ##for petlja koja ce nam saznati broj indexa username-a ako je tacan
+        if [[ "${username[$i]}" == "${loginuser}" ]]
+        then
+       potvrdauser=$i                                                           ##dodatni uslov za if ispod ako su oba indexa ista onda je password i user zajednicki tjst odgovarajuæi u arrayu
+        fi
+        done
+            
+        echo "Unesite password:"                                                ##Password sekcija
+        read loginpass
+        
+                for i in "${!password[@]}"; do
+        if [[ "${password[$i]}" == "${loginpass}" ]]
+        then
+       potvrdapass=$i
+        fi
+        done
+        
+
+if [[ $loginuser == "admin" && $potvrdauser == $potvrdapass ]]                  ##ako je username admin i ako je tacno ulogovan onda admina obavjestava da je ulogovan kao admin
+    then
+    admin=1                                                                     ##pomocna varijabla za otkljucavanje admin menu-a
+    echo "Ulogovani ste kao ADMIN."
+fi
+
+ if [[ $admin == 1 ]]
+then
+adminmeni
+else
+usermeni
+fi
+        
+if [[ " ${password[*]} " =~ " ${loginpass} " && $potvrdauser == $potvrdapass ]] ##preduslov ako je password postojeci i ako je isti index kao i od username-a to znaci da su odgovarajuci user i pass
+                    then
+                    echo "Uspjesan login"
+                    
+                    else
+                        echo "Pogresan password"
+                        loginmeni
+                        fi
+   
+   else
+    echo "Ne postoji username"
+    loginmeni
+    fi
+
+if [[ $loginuser == "admin" && $potvrdauser == $potvrdapass ]]                  ##ako je username admin i ako je tacno ulogovan onda admina obavjestava da je ulogovan kao admin
+    then
+    admin=1                                                                     ##pomocna varijabla za otkljucavanje admin menu-a
+    echo "Ulogovani ste kao ADMIN."
+fi
+
+if [[ $admin == 1 ]]
+then
+adminmeni
+else
+usermeni
+fi
+    
+    
+}
+
+adminmeni () {
+    
+   select odabiradmin in "Kreiranje pacijenta" "Editovanje pacijenta" "Brisanje pacijenta" "Ispis liste pacijenata" "Kreiranje odjela" "Exit"
+  do
+  case $odabiradmin in 
+    "Kreiranje pacijenta")
+    echo "Unesite ime pacijenta:"
+    read im
+    fname=("${fname[@]}" "$im") 
+    echo "Unesite prezime pacijenta:"
+    read pr
+    lname=("${lname[@]}" "$pr")
+    echo "Unesite adresu pacijenta:"
+    read ad
+    Adress=("${Adress[@]}" "$ad")
+    echo "Unesite jmb pacijenta:"
+    read jm
+    jmb=("${jmb[@]}" "$jm")
+    echo "Unesite analizu pacijenta:"
+    read an
+    Analiza=("${Analiza[@]}" "$an")
+    
+    
+    ;;
+    "Editovanje pacijenta")
+    echo "Unesite ime pacijenta kojeg zelite editovat"
+    read editpat
+    for i in "${!fname[@]}"; do
+   if [[ "${fname[$i]}" = "${editpat}" ]]; then
+
+        echo "Unesite novo ime pacijenta"
+        read novoime
+        fname[$i]="${novoime}"
+        echo "Unesite novo prezime pacijenta"
+        read novoprez
+        lname[$i]="${novoprez}"
+        echo "Unesite novu adresu pacijenta"
+        read novaadr
+        Adress[$i]="${novaadr}"
+        echo "Unesite novi JMB pacijenta"
+        read novijmb
+        jmb[$i]="${novijmb}"
+        echo "Unesite novu analizu pacijenta"
+        read novaana
+        Analiza[$i]="${novaana}"
+   fi
+   done
+    
+    ;;
+    "Brisanje pacijenta")
+    echo "Unesite ime pacijenta kojeg zelite izbrisat"
+    read del
+for i in "${!fname[@]}"; do
+   if [[ "${fname[$i]}" == "${del}" ]]
+   
+   then
+       fname=( "${fname[@]/$del}" )
+       del="${lname[i]}"
+       lname=( "${lname[@]/$del}")
+       del="${Adress[i]}"
+       Adress=( "${Adress[@]/$del}")
+       del="${jmb[i]}"
+       jmb=( "${jmb[@]/$del}")
+       del="${Analiza[i]}"
+       Analiza=( "${Analiza[@]/$del}")
+       echo "Uspjesno ste izbrisali usera."
+       
+       
+       
+       
+   fi
+done
+    ;;
+    "Ispis liste pacijenata")
+    n=${#fname[@]}
+    n=$((n-1))
+    for (( i = 0; i <= $n; i++ ))
+    do
+    if [[ ! -z "${fname[i]}" ]]                                                 ##NULL check ako je u arrayu prethodno izbrisan korisnik nema potrebe ispisivat || || || ||
+    then
+    echo -e "\n""IME: ${fname[i]}" "\n""PREZIME:" "${lname[i]}" "\n""ADRESA:" "${Adress[i]}" "\n""JMB:" "${jmb[i]}" "\n""ANALIZA:" "${Analiza[i]} \n"
+    fi
+done
+    ;;
+    "Kreiranje odjela")
+    
+    echo "Unesite ime novog odjela:"
+    read odjl
+    odjel=("${odjel[@]}" "$odjl") 
+    echo -e "Uspjesno ste kreirali odjel "${odjl}"\n"
+        echo -e "Postojeci odjeli su:\n"
+     n=${#odjel[@]}
+    n=$((n-1))
+    for (( i = 0; i <= $n; i++ ))
+    do
+    echo -e " "${odjel[i]}" \n" 
+done
+    
+    ;;
+    "Exit")
+       
+    admin=0
+    echo "Izlogovali ste se:"    
+    loginmeni
+    ;;
+    *)
+    
+    echo "Pogresan unos."
+    
+    ;;
+  esac
+  done
+    
+}
+
+usermeni () {
+  select odabiruser in "Ispis kartona" "Zahtjev za prijem na odjel" "Prikaz kapaciteta na odjelima" "Exit"
+  do
+  case $odabiruser in 
+    "Ispis kartona")
+    
+    for i in "${!username[@]}"; do                                         
+        if [[ "${username[$i]}" == "${loginuser}" ]]
+        then
+       n=$((i-1))  
+        fi
+        done
+    for (( i = 0; i <= $n; i++ ))
+    do
+    if [[ ! -z "${fname[i]}" ]]                                                 ##NULL check ako je u arrayu prethodno izbrisan korisnik nema potrebe ispisivat || || || ||
+    then
+    echo -e "IME: ${fname[i]}" "\n""PREZIME:" "${lname[i]}" "\n""ADRESA:" "${Adress[i]}" "\n""JMB:" "${jmb[i]}" "\n""ANALIZA:" "${Analiza[i]} \n" 
+    fi
+done
+    ;;
+    "Zahtjev za prijem na odjel")
+    
+    echo -e "Postojeci odjeli su:\n"
+     n=${#odjel[@]}
+    n=$((n-1))
+    for (( i = 0; i <= $n; i++ ))
+    do
+    echo -e " "${odjel[i]}" \n" 
+done
+    
+    pomocna_var=0
+    echo "Unesite ime odjela na koji se zelite prijavit:"
+    read odabirodjel
+    for i in "${!odjel[@]}"; do
+   if [[ "${odjel[$i]}" == "${odabirodjel}" ]]
+   
+   then
+   echo "Uspjesno ste se prijavili na odjel "${odjel[i]}""
+   a="-"
+   cap_odjela[i]+=$a
+    
+   
+    
+    for k in "${!username[@]}"; do
+   if [[ "${username[$k]}" = "${loginuser}" ]]; then
+       m=$((k-1))
+      
+   fi
+   done
+   
+ cap_odjela[$i]+="("${fname[$m]}")"
+
+ del=${fname[$m]}
+ del2="()"
+ 
+
+    
+
+   pomocna_var=$((pomocna_var+1))                                               ##Pomocna_var nam sluzi da u slucaju da ne postoji odjel da aktivira if funkciju koja ce ispisat da ne postoji odjel
+   fi
+    done
+    
+    if [[ $pomocna_var == 0 ]]
+    then
+    echo "Ne postoji taj odjel. Pokusajte ponovo."
+    fi
+    
+    ;;
+    "Prikaz kapaciteta na odjelima")
+    
+    n=${#odjel[@]}
+    n=$((n-1))
+    for (( i = 0; i <= $n; i++ ))
+    do
+    if [[ ! -z "${odjel[i]}" ]]                                                 ##NULL check ako je u arrayu prethodno izbrisan korisnik nema potrebe ispisivat || || || ||
+    then
+    echo -e "\n" "Odjel:" "${odjel[i]}"", Kapacitet:" "${cap_odjela[i]}" "\n"
+    fi
+done
+    ;;
+    "Exit")
+     for del in ${fname[@]}
+do
+   cap_odjela=("${cap_odjela[@]/$del}")
+   cap_odjela=("${cap_odjela[@]/$del2}")
+done
+    admin=0
+    echo "Izlogovali ste se:"    
+    loginmeni
+    ;;
+    *)
+    
+    ;;
+  esac
+  done
+}
+
+
+
+
+echo "-= Amar Medical Application =-"                                             
+echo "Unesite username:"
+read loginuser                                                                  ##Citanje username-a
+
+if [[ " ${username[*]} " =~ " ${loginuser} " ]]                                 ##StackOverflow kaze "The right side is considered an extended regular expression. If the left side matches, the operator returns 0, and 1 otherwise."
+     then
+        
+        for i in "${!username[@]}"; do                                          ##for petlja koja ce nam saznati broj indexa username-a ako je tacan
+        if [[ "${username[$i]}" == "${loginuser}" ]]
+        then
+       potvrdauser=$i                                                           ##dodatni uslov za if ispod ako su oba indexa ista onda je password i user zajednicki tjst odgovarajuæi u arrayu
+        fi
+        done
+            
+        echo "Unesite password:"                                                ##Password sekcija
+        read loginpass
+        
+                for i in "${!password[@]}"; do
+        if [[ "${password[$i]}" == "${loginpass}" ]]
+        then
+       potvrdapass=$i
+        fi
+        done
+        
+if [[ " ${password[*]} " =~ " ${loginpass} " && $potvrdauser == $potvrdapass ]] ##preduslov ako je password postojeci i ako je isti index kao i od username-a to znaci da su odgovarajuci user i pass
+                    then
+                    echo "Uspjesan login"
+                    
+                    else
+                        echo "Pogresan password"
+                        loginmeni
+                        fi
+   
+   else
+    echo "Ne postoji username"
+    loginmeni
+    fi
+
+if [[ $loginuser == "admin" && $potvrdauser == $potvrdapass ]]                  ##ako je username admin i ako je tacno ulogovan onda admina obavjestava da je ulogovan kao admin
+    then
+    admin=1                                                                     ##pomocna varijabla za otkljucavanje admin menu-a
+    echo "Ulogovani ste kao ADMIN."
+fi
+
+if [[ $admin == 1 ]]
+then
+adminmeni
+else
+usermeni
+fi
